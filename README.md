@@ -38,7 +38,6 @@ SkinCosmic AI is a skincare consultation chatbot built with Next.js. The applica
 - Lucide React for icons
 - Browser `localStorage` for storing skin profile data and routine tracker state
 
-## Cấu trúc chính
 ## Main structure
 
 ```text
