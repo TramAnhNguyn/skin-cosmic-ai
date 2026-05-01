@@ -80,9 +80,12 @@ export default function RoutineTracker({
 
   const daysInMonth = getDaysInMonth(calendarMonth);
   const firstDay = getFirstDayOfMonth(calendarMonth);
-  const calendarDays = Array.from({ length: firstDay }, () => null).concat(
-    Array.from({ length: daysInMonth }, (_, i) => i + 1)
-  );
+  
+  
+  const calendarDays: (number | null)[] = [
+    ...Array.from({ length: firstDay }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1)
+  ];
 
   return (
     <>
