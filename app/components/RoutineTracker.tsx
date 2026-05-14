@@ -1,7 +1,8 @@
 'use client';
 
 import { CalendarCheck, CheckCircle2, Circle, Moon, RotateCcw, Sun, ChevronLeft, ChevronRight, X } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 export type RoutineStep = {
   phase: string;
@@ -45,6 +46,12 @@ export default function RoutineTracker({
   const completedSteps = Object.values(displayChecks).filter(Boolean).length;
   const progress = totalSteps > 0 ? Math.round((completedSteps / totalSteps) * 100) : 0;
   const isToday = selectedDate === todayKey;
+
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleToggleStepWithDate = (stepId: string) => {
     onToggleStep(stepId, selectedDate);
@@ -170,44 +177,44 @@ export default function RoutineTracker({
     </section>
 
     {/* Calendar Modal */}
-    {showCalendar && (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-        <div className="rounded-2xl border border-white/10 bg-white/10 p-6 shadow-xl shadow-black/50 backdrop-blur-xl max-w-sm w-full">
+    {mounted && showCalendar && createPortal(
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md">
+        <div className="rounded-3xl border border-white/10 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl max-w-sm w-full relative">
           {/* Modal Header */}
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-bold text-white">Chọn ngày</h3>
+            <h3 className="text-lg font-bold text-white">Chọn ngày theo dõi</h3>
             <button
               onClick={() => setShowCalendar(false)}
-              className="rounded-full p-1 text-white/50 transition hover:bg-white/10 hover:text-white"
+              className="rounded-full bg-white/5 p-1.5 text-white/50 transition hover:bg-red-500/20 hover:text-red-400"
             >
               <X size={20} />
             </button>
           </div>
 
           {/* Month Navigation */}
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex items-center justify-between rounded-xl bg-white/5 p-2">
             <button
               onClick={handlePrevMonth}
-              className="rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white"
+              className="rounded-lg bg-white/5 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
             >
               <ChevronLeft size={20} />
             </button>
-            <h4 className="text-sm font-semibold text-white">
+            <h4 className="text-sm font-bold text-teal-300">
               {calendarMonth.toLocaleDateString('vi-VN', { month: 'long', year: 'numeric' })}
             </h4>
             <button
               onClick={handleNextMonth}
-              className="rounded-lg p-2 text-white/50 transition hover:bg-white/10 hover:text-white"
+              className="rounded-lg bg-white/5 p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
             >
               <ChevronRight size={20} />
             </button>
           </div>
 
           {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-1.5">
             {/* Day headers */}
             {['Cn', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'].map((day) => (
-              <div key={day} className="text-center text-xs font-semibold text-white/50 py-1">
+              <div key={day} className="text-center text-[11px] font-bold uppercase text-white/40 pb-2">
                 {day}
               </div>
             ))}
@@ -226,14 +233,14 @@ export default function RoutineTracker({
                 <button
                   key={day}
                   onClick={() => handleSelectDate(day)}
-                  className={`aspect-square rounded-lg text-sm font-medium transition ${
+                  className={`aspect-square rounded-xl text-sm font-bold transition-all duration-200 ${
                     isSelected
-                      ? 'bg-emerald-500 text-white ring-2 ring-emerald-300/50'
+                      ? 'bg-linear-to-br from-teal-400 to-emerald-500 text-white shadow-lg shadow-teal-500/30 scale-110 z-10'
                       : isCurrentDay
-                      ? 'bg-teal-500/40 text-teal-100 border border-teal-400/50'
+                      ? 'bg-white/10 text-teal-300 ring-1 ring-teal-500/50 hover:bg-white/15'
                       : hasData
-                      ? 'bg-emerald-500/30 text-emerald-100 border border-emerald-400/30 hover:bg-emerald-500/50'
-                      : 'bg-white/5 text-white/50 border border-white/10 hover:bg-white/10 hover:text-white'
+                      ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/20 hover:bg-emerald-500/30'
+                      : 'bg-transparent text-white/60 hover:bg-white/10 hover:text-white'
                   }`}
                 >
                   {day}
@@ -243,25 +250,26 @@ export default function RoutineTracker({
           </div>
 
           {/* Quick Actions */}
-          <div className="mt-6 flex gap-2">
+          <div className="mt-6 flex gap-3">
             <button
               onClick={() => {
                 setSelectedDate(todayKey);
                 setShowCalendar(false);
               }}
-              className="flex-1 rounded-lg bg-emerald-500/20 px-3 py-2 text-sm font-medium text-emerald-200 transition border border-emerald-400/30 hover:bg-emerald-500/30"
+              className="flex-1 rounded-xl bg-teal-500/20 px-4 py-2.5 text-sm font-bold text-teal-300 transition hover:bg-teal-500/30"
             >
               Hôm nay
             </button>
             <button
               onClick={() => setShowCalendar(false)}
-              className="flex-1 rounded-lg bg-white/10 px-3 py-2 text-sm font-medium text-white transition border border-white/20 hover:bg-white/15"
+              className="flex-1 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/15"
             >
               Đóng
             </button>
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     )}
     </>
   );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Leaf, LogOut, Sparkles, UserCircle } from 'lucide-react';
+import { Leaf, Lock, LogOut, Sparkles, Trash2, UserCircle } from 'lucide-react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import ChatInput, { type ChatImage } from './components/ChatInput';
@@ -36,6 +36,15 @@ const defaultProfile: SkinProfile = {
 const PROFILE_STORAGE_KEY = 'skincosmic-skin-profile';
 const ROUTINE_STORAGE_KEY = 'skincosmic-saved-routine';
 const TRACKER_STORAGE_KEY = 'skincosmic-routine-tracker';
+const MESSAGES_STORAGE_KEY = 'skincosmic-chat-messages';
+
+const defaultMessages: Message[] = [
+  {
+    role: 'bot',
+    content: 'Chào bạn! Mình là trợ lý skincare AI. Hãy tạo skin profile để mình tư vấn routine sát hơn với làn da của bạn nhé.',
+    products: [],
+  },
+];
 
 function getTodayKey() {
   return new Date().toLocaleDateString('en-CA');
@@ -44,13 +53,7 @@ function getTodayKey() {
 export default function Home() {
   const { data: session, status } = useSession();
 
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: 'bot',
-      content: 'Chào bạn! Mình là trợ lý skincare AI. Hãy tạo skin profile để mình tư vấn routine sát hơn với làn da của bạn nhé.',
-      products: [],
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>(defaultMessages);
   const [skinProfile, setSkinProfile] = useState<SkinProfile>(defaultProfile);
   const [savedRoutine, setSavedRoutine] = useState<RoutineStep[]>([]);
   const [trackerByDate, setTrackerByDate] = useState<Record<string, Record<string, boolean>>>({});
@@ -66,6 +69,7 @@ export default function Home() {
       const storedProfile = window.localStorage.getItem(PROFILE_STORAGE_KEY);
       const storedRoutine = window.localStorage.getItem(ROUTINE_STORAGE_KEY);
       const storedTracker = window.localStorage.getItem(TRACKER_STORAGE_KEY);
+      const storedMessages = window.localStorage.getItem(MESSAGES_STORAGE_KEY);
 
       if (storedProfile) {
         setSkinProfile({ ...defaultProfile, ...JSON.parse(storedProfile) });
@@ -77,6 +81,10 @@ export default function Home() {
 
       if (storedTracker) {
         setTrackerByDate(JSON.parse(storedTracker));
+      }
+
+      if (storedMessages) {
+        setMessages(JSON.parse(storedMessages));
       }
 
       setHasLoadedStorage(true);
@@ -106,6 +114,18 @@ export default function Home() {
     if (!hasLoadedStorage) return;
     window.localStorage.setItem(TRACKER_STORAGE_KEY, JSON.stringify(trackerByDate));
   }, [hasLoadedStorage, trackerByDate]);
+
+  useEffect(() => {
+    if (!hasLoadedStorage) return;
+    window.localStorage.setItem(MESSAGES_STORAGE_KEY, JSON.stringify(messages));
+  }, [hasLoadedStorage, messages]);
+
+  const handleClearChat = () => {
+    if (window.confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử trò chuyện?')) {
+      setMessages(defaultMessages);
+      window.localStorage.removeItem(MESSAGES_STORAGE_KEY);
+    }
+  };
 
   const handleSaveProfile = () => {
     window.localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(skinProfile));
@@ -201,6 +221,16 @@ export default function Home() {
             <h1 className="truncate text-lg font-bold tracking-tight text-white sm:text-xl md:text-2xl">SkinCosmic</h1>
             <p className="truncate text-[10px] font-medium text-teal-200 sm:text-xs md:text-sm">Skincare AI</p>
           </div>
+          {messages.length > 1 && (
+            <button
+              onClick={handleClearChat}
+              className="ml-2 flex shrink-0 items-center gap-1.5 rounded-full bg-white/5 px-2 py-1.5 text-xs font-medium text-slate-300 transition-colors hover:bg-red-500/20 hover:text-red-400 sm:px-3"
+              title="Xóa lịch sử trò chuyện"
+            >
+              <Trash2 size={14} />
+              <span className="hidden sm:inline">Xóa chat</span>
+            </button>
+          )}
         </div>
 
         {status === 'loading' ? (
@@ -241,21 +271,38 @@ export default function Home() {
 
       <main ref={mainScrollRef} className="relative z-10 grow overflow-y-auto">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-3 py-4 sm:px-4 sm:py-6 md:px-6 lg:grid-cols-[340px_minmax(0,1fr)]">
-          <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
-            <SkinProfilePanel
-              profile={skinProfile}
-              onChange={setSkinProfile}
-              onSave={handleSaveProfile}
-              onGenerateRoutine={handleGenerateRoutine}
-            />
-            <RoutineTracker
-              routine={savedRoutine}
-              checkedSteps={todayChecks}
-              onToggleStep={handleToggleStep}
-              onResetDay={handleResetDay}
-              trackerByDate={trackerByDate}
-              todayKey={todayKey}
-            />
+          <aside className="relative space-y-4 lg:sticky lg:top-4 lg:self-start">
+            {!session && status !== 'loading' && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center rounded-2xl bg-slate-950/60 p-6 text-center backdrop-blur-sm border border-white/10 shadow-2xl">
+                <div className="mb-3 rounded-full bg-teal-500/20 p-3 border border-teal-500/30">
+                  <Lock size={24} className="text-teal-400" />
+                </div>
+                <h3 className="mb-1 text-sm font-bold text-white">Tính năng cá nhân hóa</h3>
+                <p className="mb-4 text-xs text-slate-300">Đăng nhập để tạo hồ sơ da và theo dõi lịch trình (routine) của riêng bạn.</p>
+                <button
+                  onClick={() => signIn('google')}
+                  className="rounded-xl bg-linear-to-r from-teal-500 to-emerald-500 px-4 py-2.5 text-xs font-bold text-white shadow-lg shadow-teal-500/30 transition hover:from-teal-400 hover:to-emerald-400"
+                >
+                  Đăng nhập ngay
+                </button>
+              </div>
+            )}
+            <div className={`space-y-4 transition-all duration-300 ${!session && status !== 'loading' ? 'pointer-events-none opacity-40 select-none blur-[1px]' : ''}`}>
+              <SkinProfilePanel
+                profile={skinProfile}
+                onChange={setSkinProfile}
+                onSave={handleSaveProfile}
+                onGenerateRoutine={handleGenerateRoutine}
+              />
+              <RoutineTracker
+                routine={savedRoutine}
+                checkedSteps={todayChecks}
+                onToggleStep={handleToggleStep}
+                onResetDay={handleResetDay}
+                trackerByDate={trackerByDate}
+                todayKey={todayKey}
+              />
+            </div>
           </aside>
 
           <section className="min-w-0">
