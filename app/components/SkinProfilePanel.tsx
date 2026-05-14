@@ -56,7 +56,16 @@ export default function SkinProfilePanel({ profile, onChange, onSave, onGenerate
           </span>
           <select
             value={profile.skinType}
-            onChange={(event) => updateField('skinType', event.target.value)}
+            onChange={(event) => {
+              onChange({
+                ...profile,
+                skinType: event.target.value,
+                concerns: [],
+                avoidIngredients: '',
+                budget: '',
+                currentProducts: ''
+              });
+            }}
             className="w-full rounded-xl border border-white/10 bg-slate-950/60 px-3 py-2.5 text-sm text-white outline-none transition focus:border-teal-300"
           >
             <option value="">Chọn loại da</option>

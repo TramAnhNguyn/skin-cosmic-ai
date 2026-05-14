@@ -56,7 +56,7 @@ export default function Home() {
   const [trackerByDate, setTrackerByDate] = useState<Record<string, Record<string, boolean>>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [hasLoadedStorage, setHasLoadedStorage] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const mainScrollRef = useRef<HTMLElement>(null);
 
   const todayKey = getTodayKey();
   const todayChecks = trackerByDate[todayKey] || {};
@@ -84,8 +84,13 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (mainScrollRef.current) {
+      mainScrollRef.current.scrollTo({
+        top: mainScrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [messages, isLoading]);
 
   useEffect(() => {
     if (!hasLoadedStorage) return;
@@ -126,7 +131,7 @@ export default function Home() {
   };
 
   const handleSendMessage = async (userContent: string, image?: ChatImage) => {
-    const messageContent = userContent || `Analyze skin image: ${image?.name || 'attached image'}`;
+    const messageContent = userContent || `Phân tích làn da: ${image?.name || 'ảnh'}`;
     const userMsg: Message = {
       role: 'user',
       content: messageContent,
@@ -180,7 +185,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="flex h-[100dvh] flex-col overflow-hidden bg-linear-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute right-0 top-0 h-96 w-96 -translate-y-1/2 translate-x-1/2 rounded-full bg-teal-500/10 blur-3xl" />
         <div className="absolute bottom-0 left-0 h-96 w-96 -translate-x-1/2 translate-y-1/2 rounded-full bg-emerald-500/10 blur-3xl" />
@@ -234,7 +239,7 @@ export default function Home() {
         )}
       </header>
 
-      <main className="relative z-10 grow overflow-y-auto">
+      <main ref={mainScrollRef} className="relative z-10 grow overflow-y-auto">
         <div className="mx-auto grid w-full max-w-7xl gap-4 px-3 py-4 sm:px-4 sm:py-6 md:px-6 lg:grid-cols-[340px_minmax(0,1fr)]">
           <aside className="space-y-4 lg:sticky lg:top-4 lg:self-start">
             <SkinProfilePanel
@@ -274,7 +279,7 @@ export default function Home() {
                     </div>
                   </div>
                 )}
-                <div ref={messagesEndRef} />
+                {/* Scroll target removed, handled by main container */}
               </div>
             </div>
           </section>
