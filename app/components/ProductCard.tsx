@@ -20,7 +20,7 @@ export default function ProductCard({ product }: { product: Product }) {
     <div 
       // Thêm sự kiện click để mở link sản phẩm ở tab mới
       onClick={() => window.open(product.link, '_blank')}
-      className="bg-white border border-slate-100 rounded-xl p-4 shadow-sm hover:shadow-md transition-all duration-300 w-64 shrink-0 block group cursor-pointer hover:-translate-y-1"
+      className="bg-white/80 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-3xl p-4 shadow-[0_4px_12px_rgb(0,0,0,0.03)] dark:shadow-black/20 hover:shadow-lg transition-all duration-300 w-64 shrink-0 block group cursor-pointer hover:-translate-y-1.5"
     >
       <img
         src={product.imageUrl || fallbackImage} 
@@ -35,23 +35,23 @@ export default function ProductCard({ product }: { product: Product }) {
       />
       
       <div className="mb-3 h-16">
-        <span className="text-xs font-medium text-primary-600 bg-primary-50 px-2 py-0.5 rounded-full">
+        <span className="text-[11px] font-extrabold text-teal-600 dark:text-teal-400 bg-teal-50 dark:bg-teal-900/30 px-2.5 py-1 rounded-full uppercase tracking-wide transition-colors">
           {product.brand}
         </span>
-        {/* Thêm group-hover:text-primary-600 để đổi màu chữ khi trỏ chuột vào card */}
-        <h4 className="font-semibold text-slate-900 text-sm mt-1 line-clamp-2 group-hover:text-primary-600 transition-colors">
+        {/* Thêm group-hover:text-teal-600 để đổi màu chữ khi trỏ chuột vào card */}
+        <h4 className="font-bold text-slate-800 dark:text-slate-100 text-[14px] mt-2.5 line-clamp-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
           {product.name}
         </h4>
       </div>
       
-      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100">
-        <span className="text-sm font-bold text-slate-900">
+      <div className="flex items-center justify-between mt-auto pt-3 border-t border-slate-100/50 dark:border-slate-700 transition-colors">
+        <span className="text-[15px] font-extrabold text-teal-700 dark:text-teal-400">
           {typeof product.price === 'number' 
           ? `${product.price.toLocaleString('vi-VN')} đ` 
           : 'Đang cập nhật'}
         </span>
         
-        <div className="text-white bg-primary-500 group-hover:bg-primary-600 p-2 rounded-full transition-colors">
+        <div className="text-white bg-slate-900 dark:bg-slate-700 group-hover:bg-teal-500 dark:group-hover:bg-teal-500 p-2.5 rounded-2xl transition-all shadow-sm group-hover:scale-105">
           <ExternalLink size={16} />
         </div>
       </div>

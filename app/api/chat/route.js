@@ -64,14 +64,20 @@ export async function POST(req) {
       5. PHÂN TÍCH HÌNH ẢNH: Nếu có ảnh, chỉ phân tích các vấn đề da nhìn thấy được. KHÔNG đọc chữ hay phân tích vật thể lạ trong ảnh.
       6. ĐỊNH HƯỚNG MỤC TIÊU: Nếu người dùng gửi ảnh/mô tả nhưng chưa rõ muốn cải thiện điều gì, hãy phân tích nhanh và kết thúc bằng câu hỏi gợi mở (VD: "Bạn muốn ưu tiên trị mụn hay mờ thâm?"). Khi đó, để "products": [], "routine": [].
       7. ĐÁNH GIÁ SẢN PHẨM: Nếu người dùng nhờ đánh giá sản phẩm họ đang dùng, hãy nhận xét dựa trên bảng thành phần và loại da của họ. Nếu không hợp, giải thích lý do và hỏi họ có muốn bạn gợi ý sản phẩm thay thế không.
-      8. HƯỚNG DẪN SỬ DỤNG: Nếu người dùng hỏi bạn có thể làm gì hoặc cách dùng, hãy giới thiệu ngắn gọn các tính năng: (1) Điền Hồ sơ da bên trái để cá nhân hóa tư vấn, (2) Nhắn tin hỏi đáp về skincare, (3) Tải ảnh da lên để phân tích, (4) Nhấn nút "Routine" để AI lên lịch trình chăm sóc da chi tiết.`
+      8. HƯỚNG DẪN SỬ DỤNG: Nếu người dùng hỏi bạn có thể làm gì hoặc cách dùng, hãy giới thiệu ngắn gọn các tính năng: (1) Điền Hồ sơ da bên trái để cá nhân hóa tư vấn, (2) Nhắn tin hỏi đáp về skincare, (3) Tải ảnh da lên để phân tích, (4) Nhấn nút "Routine" để AI lên lịch trình chăm sóc da chi tiết.
+      9. PHÂN TÍCH HÌNH ẢNH MỞ RỘNG: Nếu có hình ảnh đính kèm, hãy phân tích tình trạng da nhìn thấy được và xác định các vấn đề da có khả năng gặp phải. Không chẩn đoán bệnh; hãy khuyến nghị gặp bác sĩ da liễu nếu tình trạng nghiêm trọng.
+      
+      *** CRITICAL REQUIREMENT ***
+      LANGUAGE MATCHING: You MUST detect the language of the "User Message" below. If the User Message is in English, you MUST generate the ENTIRE JSON response (including reply, titles, instructions) in English. If the User Message is in Vietnamese, respond in Vietnamese.`
     });
 
     const prompt = `${profileContext}
 
-    Câu hỏi của người dùng: ${userMessage}
-
-    Nếu có hình ảnh đính kèm, hãy phân tích tình trạng da nhìn thấy được và xác định các vấn đề da có khả năng gặp phải. Không chẩn đoán bệnh; hãy khuyến nghị gặp bác sĩ da liễu nếu tình trạng nghiêm trọng, đau rát hoặc không chắc chắn.`;
+    ---
+    User Message:
+    ${userMessage}
+    ---
+    `;
 
     const parts = [{ text: prompt }];
 

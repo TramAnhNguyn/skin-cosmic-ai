@@ -34,10 +34,10 @@ export default function MessageItem({ message }: { message: Message }) {
   return (
     <div className={`mb-6 flex items-start gap-3 ${isBot ? '' : 'flex-row-reverse'}`}>
       <div
-        className={`shrink-0 rounded-full p-2.5 shadow-sm ${
+        className={`shrink-0 rounded-[20px] p-2.5 shadow-sm ${
           isBot
-            ? 'border border-emerald-100 bg-emerald-50 text-emerald-600'
-            : 'border border-slate-100 bg-white text-slate-400'
+            ? 'bg-linear-to-br from-teal-400 to-emerald-500 text-white shadow-md shadow-teal-500/20'
+            : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-500 transition-colors'
         }`}
       >
         {isBot ? <Bot size={20} /> : <User size={20} />}
@@ -52,10 +52,10 @@ export default function MessageItem({ message }: { message: Message }) {
           />
         )}
         <div
-          className={`max-w-[85%] rounded-2xl p-4 md:max-w-md ${
+          className={`max-w-[85%] rounded-3xl p-4.5 md:max-w-md ${
             isBot
-              ? 'rounded-bl-none border border-emerald-50 bg-white text-slate-700 shadow-sm'
-              : 'rounded-br-none bg-emerald-500 font-medium text-white shadow-md'
+              ? 'rounded-tl-sm border border-emerald-50/50 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 shadow-[0_4px_15px_rgb(0,0,0,0.03)] dark:shadow-black/20 transition-colors'
+              : 'rounded-tr-sm bg-linear-to-r from-teal-500 to-emerald-500 font-medium text-white shadow-md shadow-teal-500/20 dark:shadow-teal-900/40'
           }`}
         >
           <p className="whitespace-pre-line text-[15px] leading-relaxed">{message.content}</p>
